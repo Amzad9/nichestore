@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const subcategorySchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Subcategory name is required'],
     trim: true,
     unique: true,
     maxlength: [100, 'Subcategory name should not exceed 100 characters'],
@@ -18,6 +17,9 @@ const subcategorySchema = new mongoose.Schema({
     ref: 'category',
     required: [true, 'Category reference is required'],
   },
+  image:{
+    type:String,
+  }
 }, { timestamps: true });
 
 const subCategortModel =  mongoose.model('Subcategory', subcategorySchema);

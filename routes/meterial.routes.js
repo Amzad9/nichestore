@@ -6,14 +6,16 @@ import {
     fetchMaterialById, 
     updateMeterial 
 } from "../controllers/material.controller.js";
-meterialDeleteById
+import { upload } from "../middleware/multer.middleware.js";
+
+
 const meterialRoutes = Router();
 
-meterialRoutes.route("/meterial").post(createMaterial);
+meterialRoutes.route("/meterial").post(upload.fields([{ name: 'image', maxCount: 1 }]),createMaterial);
 meterialRoutes.route("/meterial").get(materialList);
 meterialRoutes.route("/meterial/:id").get(fetchMaterialById);
 meterialRoutes.route("/meterial/:id").delete(meterialDeleteById);
-meterialRoutes.route("/meterial/:id").patch(updateMeterial);
+meterialRoutes.route("/meterial/:id").patch(upload.fields([{ name: 'image', maxCount: 1 }]),updateMeterial);
 
 
 export default meterialRoutes;

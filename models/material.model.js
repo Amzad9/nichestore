@@ -13,6 +13,9 @@ const materialSchema = new mongoose.Schema({
     trim: true,
     maxlength: [500, 'Material description should not exceed 500 characters'],
   },
+  image:{
+    type: String
+  }
 }, { timestamps: true });
 
 const meterialModel = mongoose.model('Material', materialSchema);

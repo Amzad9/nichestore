@@ -1,5 +1,6 @@
 import meterialModel from "../models/material.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadOnCloudinary } from "./../utils/cloudinary.js"
 
 const createMaterial = asyncHandler(async (req, res) => {
     try {
@@ -7,7 +8,19 @@ const createMaterial = asyncHandler(async (req, res) => {
         if (!name || !description) {
             return res.status(400).json({ message: "Name and Description are required." });
         }
-        const meterial = await meterialModel.create({ name, description });
+        const imageUrl = req.files?.image[0].path;
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: "Please upload an image." });
+    }
+
+    let imagePath;
+    try {
+      imagePath = await uploadOnCloudinary(imageUrl);
+    } catch (uploadError) {
+      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+    }
+        const meterial = await meterialModel.create({ name, description,image: imagePath.url });
 
         return res.status(201).json({ data: meterial, message: "Material created successfully." });
     } catch (error) {
@@ -21,7 +34,7 @@ const materialList = asyncHandler(async (req, res) => {
         if (!meterial) {
             return res.status(404).json({ message: "No meterial found." })
         }
-        return res.status(200).json({ data: meterial, message: "fetch meterial successfully." })
+        return res.status(200).json({ payload: meterial, message: "fetch meterial successfully." })
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" })
     }
@@ -36,7 +49,7 @@ const fetchMaterialById = asyncHandler(async (req, res) => {
         if (!meterial) {
             return res.status(404).json({ message: "Meterial not found." })
         }
-        return res.status(200).json({ data: meterial, message: "fetch meterial successfully" })
+        return res.status(200).json({ payload: meterial, message: "fetch meterial successfully" })
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" })
     }
@@ -66,12 +79,25 @@ const updateMeterial = asyncHandler(async (req, res) => {
             return res.status(404).json({ message: "meterial Id not found." })
         }
 
-        const meterial = await meterialModel.findByIdAndUpdate(id, { name, description }, { new: true });
+        const imageUrl = req.files?.image[0].path;
+    
+        if (!imageUrl) {
+          return res.status(400).json({ message: "Please upload an image." });
+        }
+    
+        let imagePath;
+        try {
+          imagePath = await uploadOnCloudinary(imageUrl);
+        } catch (uploadError) {
+          return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+        }
+
+        const meterial = await meterialModel.findByIdAndUpdate(meterialId._id, { name, description,image: imagePath.url }, { new: true });
 
         if (!meterial) {
             return res.status(404).json({ message: "Meterial not found." })
         }
-        return res.status(200).json({ data: meterial, message: "meterial updated successfully" })
+        return res.status(200).json({ playload: meterial, message: "meterial updated successfully" })
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" })
     }

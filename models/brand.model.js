@@ -13,6 +13,9 @@ const brandSchema = new mongoose.Schema({
     trim: true,
     maxlength: [500, 'Brand description should not exceed 500 characters'],
   },
+  image:{
+    type:String,
+  },
 }, { timestamps: true });
 
 const brandModel =  mongoose.model('Brand', brandSchema);

@@ -8,14 +8,19 @@ import { uploadOnCloudinary } from "./../utils/cloudinary.js"
 const createCategories = asyncHandler(async (req, res) => {
   try {
     const { name, description } = req.body;
-
+    const datanme = await categoryModal.findOne({name});
+    if(datanme){
+      return res.status(400).json({message: "Category already exist" })
+    }
     if (!name || !description) {
       return res.status(400).json({ message: "name and description are required." });
     }
-    const image = req.files?.image[0].path;
+
+    const image = req.files.image?.[0].path; 
     if (!image) {
       return res.status(400).json({ message: "Please upload an image." });
     }
+
     const imagePath = await uploadOnCloudinary(image)
 
     const category = await categoryModal.create({ name, description, image: imagePath.url });
@@ -29,7 +34,7 @@ const createCategories = asyncHandler(async (req, res) => {
 const categoryList = asyncHandler(async (req, res) => {
   try {
     const categories = await categoryModal.find();
-    return res.status(200).json({ data: categories, message: "Categories fetched successfully." })
+    return res.status(200).json({ payload:categories, message: "Categories fetched successfully." })
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" })
   }

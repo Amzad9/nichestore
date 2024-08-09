@@ -25,6 +25,7 @@ const productSchema = new mongoose.Schema({
   subcategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subcategory',
+    trim: true
   },
   brand: {
     type: mongoose.Schema.Types.ObjectId,
