@@ -1,18 +1,27 @@
 import mongoose from "mongoose";
 
 const ProductSubSchema = new mongoose.Schema({
-    productId: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Product', required: true
-    },
-    quantity: { 
-        type: Number, 
-        required: true 
-    },
-    price: { 
-        type: Number, 
-        required: true 
-    },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+      },
+      title: {
+        type: String
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: [1, 'Quantity cannot be less than 1'],
+      },
+      image: {
+        type: String,
+      },
+      price: {
+        type: Number,
+        required: true,
+        min: [0, 'Price cannot be negative'],
+      },
 });
 
 const orderSchema = new mongoose.Schema({
@@ -24,6 +33,7 @@ const orderSchema = new mongoose.Schema({
         type: [ProductSubSchema],
         required: true
     },
+    totalPrice: Number,
     shippingAddress: {
         address: String,
         city: String,
@@ -31,7 +41,7 @@ const orderSchema = new mongoose.Schema({
         country: String
     },
     paymentMethod: String,
-    totalPrice: Number,
+    status: String,
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date, default: null },
     isDelivered: { type: Boolean, default: false },

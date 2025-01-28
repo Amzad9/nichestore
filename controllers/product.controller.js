@@ -79,13 +79,12 @@ const fetchProducts = asyncHandler(async (req, res) => {
 const fetchProductById = asyncHandler(async(req, res) => {
   try {
    const id = req.params.id;
-   const proId = await subCategortModel.findById(id);
+   const proId = await productModel.findById(id).populate('category subcategory brand reviews');
    console.log(proId)
-
    if(!proId){
        return res.status(404).json({message: "Product id not found."})
    }
-   return res.status(200).json({ data: subcategory, message: "fetch Product successfully"})
+   return res.status(200).json({ payload: proId, message: "fetch Product successfully"})
   } catch (error) {
    return res.status(500).json({ message: "Internal server error"})
   }

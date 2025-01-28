@@ -15,6 +15,20 @@ const productSchema = new mongoose.Schema({
     type: Number,
     min: [0, 'Product price cannot be negative'],
   },
+  actualPrice:{
+    type:Number,
+    min: [0, 'Product price cannot be negative'],
+  },
+  discount:{
+    type:Number,
+    min: [0, 'Stock cannot be negative'],
+    default: 0,
+  },
+  quantity:{
+    type:Number,
+    min: [0, 'Stock cannot be negative'],
+    default: 1
+  },
   image: {
     type: String,
   },

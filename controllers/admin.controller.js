@@ -32,6 +32,13 @@ const userLogin = asyncHandler(async (req, res) => {
          { expiresIn: "24h" }
       )
 
+      res.cookie('auth_token', token, {
+         httpOnly: true,
+         secure: process.env.NODE_ENV === 'production',
+         sameSite: 'Strict',
+         maxAge: 24 * 60 * 60 * 1000,
+      });
+      req.session.user = userExits;
       return res.status(200).json({ user: userExits, token, message: "user successfully logined" })
 
    } catch (error) {
@@ -86,6 +93,7 @@ const userRegister = asyncHandler(async (req, res) => {
 
 const userList = asyncHandler(async (req, res) => {
    try {
+      
       const limit = parseInt(req.query.limit, 10) || 10;
       const page = parseInt(req.query.page, 10) || 1
       const skip = limit * (page - 1)
@@ -150,5 +158,34 @@ const forgotPassword = asyncHandler(async (req, res) => {
    }
 })
 
+// User logout function
+const userLogout = asyncHandler(async (req, res) => {
+   try {
+      // Destroy the session
+      req.session.destroy((err) => {
+         if (err) {
+            return res.status(500).json({ message: 'Could not log out' });
+         }
+         // Clear the JWT cookie
+         res.clearCookie('auth_token'); 
+         return res.status(200).json({ message: 'Logged out successfully' });
+      });
+   } catch (error) {
+      return res.status(500).json({ message: 'Internal server error during logout' });
+   }
+});
+const checkSession = asyncHandler(async (req, res) => {
+try {
+   console.log("req.session", req.session.user)
+    if (req.session && req.session.user) {
+console.log("req.session.user", req.session.user)
+       return res.status(200).json({ loggedIn: true, user: req.session.user });
+    } else {
+       return res.status(401).json({ loggedIn: false });
+    }
+} catch (error) {
+   return res.status(500).json({ message: 'Internal server error' })
+}
+});
 
-export { userRegister, userLogin, userList, resetPassword, forgotPassword }
+export { userRegister, userLogin, userList, resetPassword, forgotPassword, userLogout, checkSession }
