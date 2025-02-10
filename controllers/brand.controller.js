@@ -2,35 +2,46 @@ import brandModel from "../models/brand.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "./../utils/cloudinary.js"
 
-
 const createBrand = asyncHandler(async (req, res) => {
   try {
     const { name, description } = req.body;
+
     if (!name || !description) {
       return res.status(400).json({ message: "Please fill in all fields." });
     }
-    const bransName = await brandModel.findOne({ name });
-    if (bransName) {
+
+    // Check if brand name already exists
+    const existingBrand = await brandModel.findOne({ name });
+    if (existingBrand) {
       return res.status(400).json({ message: "Brand name already exists." });
     }
-    const imageUrl = req.files?.image[0].path;
 
-    if (!imageUrl) {
+    // Validate image
+    if (!req.file) {
       return res.status(400).json({ message: "Please upload an image." });
     }
 
+    // Upload Image to Cloudinary
     let imagePath;
     try {
-      imagePath = await uploadOnCloudinary(imageUrl);
+      const cloudinaryResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+        throw new Error("Cloudinary upload failed");
+      }
+      imagePath = cloudinaryResult.secure_url; // Use `secure_url`
     } catch (uploadError) {
-      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+      return res.status(500).json({ message: "Image upload failed", error: uploadError });
     }
-    const brand = await brandModel.create({ name, description, image: imagePath.url });
+
+    // Save brand in DB
+    const brand = await brandModel.create({ name, description, image: imagePath });
+
     return res.status(201).json({ payload: brand, message: "Brand created successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Error creating brand." });
+    return res.status(500).json({ message: "Error creating brand.", error: error.message });
   }
-})
+});
+
 
 const fetchBrand = asyncHandler(async (req, res) => {
   try {

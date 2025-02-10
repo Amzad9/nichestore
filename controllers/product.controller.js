@@ -32,11 +32,17 @@ const productCreate = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: `Missing required fields: ${missingFields.join(', ')}` });
     }
 
-    const imagePath = req.files?.image[0].path;
-    if (!imagePath || !req.files) {
-      return res.status(400).json({ message: "No image uploaded" });
+    // Upload Image to Cloudinary
+    let imagePath;
+    try {
+      const cloudinaryResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+        throw new Error("Cloudinary upload failed");
+      }
+      imagePath = cloudinaryResult.secure_url; // Use `secure_url`
+    } catch (uploadError) {
+      return res.status(500).json({ message: "Image upload failed", error: uploadError });
     }
-    const imageurl = await uploadOnCloudinary(imagePath);
     let parsedReviews = [];
 
     if (reviews) {
@@ -51,7 +57,7 @@ const productCreate = asyncHandler(async (req, res) => {
       title,
       description,
       price,
-      image: imageurl.url,
+      image: imagePath,
       category: category,
       subcategory: subcategory,
       brand: brand,
@@ -165,19 +171,16 @@ const updateProduct = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Product id not found." });
     }
 
-    const imageUrl = req.files?.image?.[0]?.path;
-    console.log("Image URL:", imageUrl);
-
-    if (!imageUrl) {
-      return res.status(400).json({ message: "Please upload an image." });
-    }
-
+    // Upload Image to Cloudinary
     let imagePath;
     try {
-      imagePath = await uploadOnCloudinary(imageUrl);
-      console.log("Uploaded Image Path:", imagePath);
+      const cloudinaryResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+        throw new Error("Cloudinary upload failed");
+      }
+      imagePath = cloudinaryResult.secure_url; // Use `secure_url`
     } catch (uploadError) {
-      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+      return res.status(500).json({ message: "Image upload failed", error: uploadError });
     }
 
     let parsedReviews = [];
@@ -190,7 +193,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
     
     const updateData = {
-      title, description, price, image: imagePath.url, category, subcategory, brand, stock, rating, reviews: parsedReviews
+      title, description, price, image: imagePath, category, subcategory, brand, stock, rating, reviews: parsedReviews
     };
 
     if (subcategory) {

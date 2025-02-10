@@ -16,14 +16,14 @@ const createCategories = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "name and description are required." });
     }
 
-    const image = req.files.image?.[0].path; 
-    if (!image) {
-      return res.status(400).json({ message: "Please upload an image." });
-    }
+    // const image = req.files.image?.[0].path; 
+    // if (!image) {
+    //   return res.status(400).json({ message: "Please upload an image." });
+    // }
 
-    const imagePath = await uploadOnCloudinary(image)
+    // const imagePath = await uploadOnCloudinary(image)
 
-    const category = await categoryModal.create({ name, description, image: imagePath.url });
+    const category = await categoryModal.create({ name, description });
     console.log(category)
     return res.status(201).json({ data: category, message: "Category created successfully." });
   } catch (error) {
@@ -78,18 +78,18 @@ const updateCategoryById = asyncHandler(async (req, res) => {
 
     const imageUrl = req.files?.image[0].path;
 
-    if (!imageUrl) {
-      return res.status(400).json({ message: "Please upload an image." });
-    }
+    // if (!imageUrl) {
+    //   return res.status(400).json({ message: "Please upload an image." });
+    // }
 
-    let imagePath;
-    try {
-      imagePath = await uploadOnCloudinary(imageUrl);
-    } catch (uploadError) {
-      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
-    }
+    // let imagePath;
+    // try {
+    //   imagePath = await uploadOnCloudinary(imageUrl);
+    // } catch (uploadError) {
+    //   return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+    // }
 
-    const category = await categoryModal.findByIdAndUpdate(catId._id, { name, description, image: imagePath.url },{ new: true });
+    const category = await categoryModal.findByIdAndUpdate(catId._id, { name, description},{ new: true });
 
     return res.status(200).json({ data: category, message: "Category updated successfully." })
   } catch (error) {

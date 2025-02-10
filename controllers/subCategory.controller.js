@@ -12,19 +12,19 @@ const createSubCategory = asyncHandler(async (req, res) => {
         if (!categoryId) {
             return res.status(400).json({ message: "Category ID is required." });
         }
-        const imageUrl = req.files?.image[0].path;
+        // const imageUrl = req.files?.image[0].path;
 
-        if (!imageUrl) {
-          return res.status(400).json({ message: "Please upload an image." });
-        }
+        // if (!imageUrl) {
+        //   return res.status(400).json({ message: "Please upload an image." });
+        // }
     
-        let imagePath;
-        try {
-          imagePath = await uploadOnCloudinary(imageUrl);
-        } catch (uploadError) {
-          return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
-        }
-        const subcategory = (await subCategortModel.create({ categoryId, name, description, image:imagePath.url }));
+        // let imagePath;
+        // try {
+        //   imagePath = await uploadOnCloudinary(imageUrl);
+        // } catch (uploadError) {
+        //   return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+        // }
+        const subcategory = (await subCategortModel.create({ categoryId, name, description }));
         return res.status(201).json({ payload: subcategory, message: "Sub Category created successfully." });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message })
@@ -80,19 +80,19 @@ const updateSubCategory = asyncHandler(async(req, res) => {
         return res.status(404).json({message: "Subcategory not found."})
     }
     
-    const imageUrl = req.files?.image[0].path;
+    // const imageUrl = req.files?.image[0].path;
 
-    if (!imageUrl) {
-      return res.status(400).json({ message: "Please upload an image." });
-    }
+    // if (!imageUrl) {
+    //   return res.status(400).json({ message: "Please upload an image." });
+    // }
 
-    let imagePath;
-    try {
-      imagePath = await uploadOnCloudinary(imageUrl);
-    } catch (uploadError) {
-      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
-    }
-    const subcategory = await subCategortModel.findByIdAndUpdate(subcatId._id, {categoryId, name, description, image:imagePath.url} ,{new: true})
+    // let imagePath;
+    // try {
+    //   imagePath = await uploadOnCloudinary(imageUrl);
+    // } catch (uploadError) {
+    //   return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+    // }
+    const subcategory = await subCategortModel.findByIdAndUpdate(subcatId._id, {categoryId, name, description} ,{new: true})
     if(!subcategory){
         return res.status(404).json({message: "Subcategory not found."})
     }

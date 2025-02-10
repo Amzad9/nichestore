@@ -3,10 +3,10 @@ import {productCreate, fetchProducts,fetchProductById,updateProduct,productDelet
 import { upload } from "../middleware/multer.middleware.js";
 
 const productRoutes = Router();
-productRoutes.route("/product").post(upload.fields([{name: 'image', maxCount: 1}]),productCreate)
+productRoutes.route("/product").post(upload.single("image"),productCreate)
 productRoutes.route("/product").get(fetchProducts);
 productRoutes.route("/product/:id").get(fetchProductById);
 productRoutes.route("/product/:id").delete(productDeleteById);
-productRoutes.route("/product/:id").patch(upload.fields([{name: 'image', maxCount: 1}]),updateProduct);
+productRoutes.route("/product/:id").patch(upload.single("image"),updateProduct);
 
 export default productRoutes
