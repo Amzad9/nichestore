@@ -90,13 +90,14 @@ const updateBrand = asyncHandler(async (req, res) => {
     if (!brandId) {
       return res.status(404).json({ message: "Brand id not found." })
     }
-    const imageUrl = req.files?.image[0].path;
 
-    if (!imageUrl) {
+     // Validate image
+    if (!req.file) {
       return res.status(400).json({ message: "Please upload an image." });
     }
 
-  let imagePath;
+   // Upload Image to Cloudinary
+    let imagePath;
     try {
       const cloudinaryResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
       if (!cloudinaryResult || !cloudinaryResult.secure_url) {
