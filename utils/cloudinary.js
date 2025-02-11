@@ -35,9 +35,9 @@ dotenv.config();
 
 // 🔹 Configure Cloudinary
 cloudinary.config({
-    cloud_name: 'dk3seqwmg', 
-    api_key: '642823594613213', 
-    api_secret: 'IZuTI8hzy_kgBtYl05cVawSM7M4'
+    cloud_name: import.meta.cloud_name, 
+    api_key: import.meta.api_key, 
+    api_secret: import.meta.api_secret
 });
 
 // 🔹 Upload Function (Accepts Buffers Instead of File Paths)
