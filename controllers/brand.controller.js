@@ -96,13 +96,18 @@ const updateBrand = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "Please upload an image." });
     }
 
-    let imagePath;
+  let imagePath;
     try {
-      imagePath = await uploadOnCloudinary(imageUrl);
+      const cloudinaryResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+        throw new Error("Cloudinary upload failed");
+      }
+      imagePath = cloudinaryResult.secure_url; // Use `secure_url`
     } catch (uploadError) {
-      return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+      return res.status(500).json({ message: "Image upload failed", error: uploadError });
     }
-    const brand = await brandModel.findByIdAndUpdate(brandId._id, { name, description, image: imagePath.url }, { new: true });
+
+    const brand = await brandModel.findByIdAndUpdate(brandId._id, { name, description, image: imagePath }, { new: true });
     console.log({brand})
     if (!brand) {
       return res.status(404).json({ message: "Brand not found." })
